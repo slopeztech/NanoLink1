@@ -47,9 +47,9 @@ void setup()
     Serial.println("ERROR 1: RF24 is not responding");
     lcd_home("ERR1");
   }
-
   else
   {
+    radio.enableDynamicPayloads();
     radio.setPALevel(PA_LEVEL);
     radio.setDataRate(DATA_RATE);
     radio.setRetries(RETRY_DELAY_STEPS, RETRY_COUNT);
@@ -100,7 +100,6 @@ void handleCommand(const String &cmd)
     lcd_home("  RX");
     if (debugEnabled) Serial.println("Switched to RX mode");
   }
-
   else if (cmd == "TX")
   {
     radio.stopListening();
@@ -108,7 +107,6 @@ void handleCommand(const String &cmd)
     lcd_home("  TX");
     if (debugEnabled) Serial.println("Switched to TX mode");
   }
-
   else if (cmd.startsWith("SEND "))
   {
     if (radioListening)
@@ -118,13 +116,19 @@ void handleCommand(const String &cmd)
     }
 
     String message = cmd.substring(5);
+    if (message.length() > 31) {
+      message = message.substring(0, 31);
+      if (debugEnabled) Serial.println("Mensaje truncado a 31 bytes.");
+    }
+
     bool messageSent = radio.write(message.c_str(), message.length() + 1);
 
     if (debugEnabled)
     {
       if (messageSent)
       {
-       Serial.println("Message sent successfully");
+        Serial.print("Message sent successfully: ");
+        Serial.println(message.c_str());
       }
       else
       {
@@ -132,7 +136,6 @@ void handleCommand(const String &cmd)
       }
     }
   }
-
   else if (cmd == "PING")
   {
     Serial.println("PONG");
@@ -140,19 +143,16 @@ void handleCommand(const String &cmd)
     delay(1500);
     lcd_home(radioListening ? "  RX" : "  TX");
   }
-
   else if (cmd == "DEBUG ON")
   {
     debugEnabled = true;
     Serial.println("Debug mode ENABLED");
   }
-
   else if (cmd == "DEBUG OFF")
   {
     debugEnabled = false;
     Serial.println("Debug mode DISABLED");
   }
-
   else
   {
     lcd_home("ERR2");
