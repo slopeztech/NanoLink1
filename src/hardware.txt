@@ -1,0 +1,3 @@
+Original pantalla:
+https://es.aliexpress.com/item/1005005985379835.html
+https://registry.platformio.org/libraries/holgerlembke/st7567sfGK%20128x64%20i2c%20LCD%20driver%20for%20Generation%20Klick
